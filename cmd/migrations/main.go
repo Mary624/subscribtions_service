@@ -1,28 +1,29 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
+	"subscriptions_rest/internal/config"
 
-	"github.com/go-pg/migrations/v8"
-	"github.com/go-pg/pg/v10"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 func main() {
-	db := pg.Connect(&pg.Options{
-		User:     "postgres",
-		Database: "subscribes",
-	})
-
-	oldVersion, newVersion, err := migrations.Run(db, flag.Args()...)
+	// TODO
+	cfg, err := config.New("../../config/config.yaml")
 	if err != nil {
-		log.Fatal("failed to run migrations", err.Error())
+		log.Fatal(err)
 	}
-
-	if newVersion != oldVersion {
-		fmt.Printf("migrated from version %d to %d\n", oldVersion, newVersion)
-	} else {
-		fmt.Printf("version is %d\n", oldVersion)
+	m, err := migrate.New(
+		"file://../../db/migrations",
+		fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", cfg.Postgres.Username,
+			cfg.Postgres.Password, cfg.Postgres.URL, cfg.Postgres.Database))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := m.Up(); err != nil {
+		log.Fatal(err)
 	}
 }

@@ -1,0 +1,8 @@
+port: 8080
+
+postgres: 
+  timeout: "3m"
+  database: "postgres-test"
+  url: "localhost:5432"
+  username: ${POSTGRES_USERNAME}
+  password: ${POSTGRES_PASSWORD}
