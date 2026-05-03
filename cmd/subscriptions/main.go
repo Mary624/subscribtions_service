@@ -18,14 +18,12 @@ import (
 
 //	@license.name	Subscriptions Service 1.0
 
-// @host		localhost
-// @BasePath	/
-//
+// @host		localhost:8080
+// @BasePath /api/v1
+
 //go:generate swag init -g ./cmd/subscriptions/main.go --pd --parseInternal --output ../../docs --dir ../..
 func main() {
-	// TODO
-	// check empty user id
-	cfg, err := config.New("../../config/config.yaml")
+	cfg, err := config.New("config/config.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}

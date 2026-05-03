@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+// Date model info
+// @Description The date
 type Date struct {
 	Year  int
 	Month int

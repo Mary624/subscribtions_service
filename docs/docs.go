@@ -20,14 +20,28 @@ const docTemplate = `{
     "paths": {
         "/subscribtions": {
             "get": {
-                "description": "Создает подписку",
+                "description": "Получает подписку",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Create subscription",
+                "summary": "Get subscription",
+                "parameters": [
+                    {
+                        "description": "getSubscribtion",
+                        "name": "Entry",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/subscriptions_rest_internal_domain.Subscribtion"
+                        }
+                    }
+                ],
                 "responses": {
-                    "201": {
-                        "description": "Created"
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/subscriptions_rest_internal_domain.Subscribtion"
+                        }
                     },
                     "400": {
                         "description": "Bad Request"
@@ -43,9 +57,49 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Update subscription",
+                "parameters": [
+                    {
+                        "description": "updateSubscribtion",
+                        "name": "Entry",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/subscriptions_rest_internal_domain.Subscribtion"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "description": "Создает подписку",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create subscription",
+                "parameters": [
+                    {
+                        "description": "createSubscribtion",
+                        "name": "Entry",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/subscriptions_rest_internal_domain.Subscribtion"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
                     },
                     "400": {
                         "description": "Bad Request"
@@ -61,6 +115,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Delete subscription",
+                "parameters": [
+                    {
+                        "description": "deleteSubscribtion",
+                        "name": "Entry",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/subscriptions_rest_internal_domain.Subscribtion"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -104,6 +169,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Get subscriptions price",
+                "parameters": [
+                    {
+                        "description": "getSubscribtionsPrice",
+                        "name": "Entry",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/subscriptions_rest_internal_domain.Subscribtion"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -123,6 +199,7 @@ const docTemplate = `{
     },
     "definitions": {
         "subscriptions_rest_internal_domain.Date": {
+            "description": "The date",
             "type": "object",
             "properties": {
                 "month": {
@@ -169,8 +246,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost",
-	BasePath:         "/",
+	Host:             "localhost:8080",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Subscriptions Service",
 	Description:      "This is a service for checking subscriptions.",

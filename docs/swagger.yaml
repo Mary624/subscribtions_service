@@ -1,6 +1,7 @@
-basePath: /
+basePath: /api/v1
 definitions:
   subscriptions_rest_internal_domain.Date:
+    description: The date
     properties:
       month:
         type: integer
@@ -27,7 +28,7 @@ definitions:
       user_id:
         type: string
     type: object
-host: localhost
+host: localhost:8080
 info:
   contact: {}
   description: This is a service for checking subscriptions.
@@ -39,6 +40,13 @@ paths:
   /subscribtions:
     delete:
       description: Удаляет подписку
+      parameters:
+      - description: deleteSubscribtion
+        in: body
+        name: Entry
+        required: true
+        schema:
+          $ref: '#/definitions/subscriptions_rest_internal_domain.Subscribtion'
       produces:
       - application/json
       responses:
@@ -50,7 +58,35 @@ paths:
           description: Internal Server Error
       summary: Delete subscription
     get:
+      description: Получает подписку
+      parameters:
+      - description: getSubscribtion
+        in: body
+        name: Entry
+        required: true
+        schema:
+          $ref: '#/definitions/subscriptions_rest_internal_domain.Subscribtion'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/subscriptions_rest_internal_domain.Subscribtion'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Get subscription
+    post:
       description: Создает подписку
+      parameters:
+      - description: createSubscribtion
+        in: body
+        name: Entry
+        required: true
+        schema:
+          $ref: '#/definitions/subscriptions_rest_internal_domain.Subscribtion'
       produces:
       - application/json
       responses:
@@ -63,6 +99,13 @@ paths:
       summary: Create subscription
     put:
       description: Обновляет подписку
+      parameters:
+      - description: updateSubscribtion
+        in: body
+        name: Entry
+        required: true
+        schema:
+          $ref: '#/definitions/subscriptions_rest_internal_domain.Subscribtion'
       produces:
       - application/json
       responses:
@@ -91,6 +134,13 @@ paths:
   /subscribtions/price:
     get:
       description: Получает стоимость подписок за указанный период
+      parameters:
+      - description: getSubscribtionsPrice
+        in: body
+        name: Entry
+        required: true
+        schema:
+          $ref: '#/definitions/subscriptions_rest_internal_domain.Subscribtion'
       produces:
       - application/json
       responses:

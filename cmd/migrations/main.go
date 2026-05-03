@@ -11,13 +11,12 @@ import (
 )
 
 func main() {
-	// TODO
-	cfg, err := config.New("../../config/config.yaml")
+	cfg, err := config.New("config/config.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}
 	m, err := migrate.New(
-		"file://../../db/migrations",
+		"file://db/migrations",
 		fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", cfg.Postgres.Username,
 			cfg.Postgres.Password, cfg.Postgres.URL, cfg.Postgres.Database))
 	if err != nil {
