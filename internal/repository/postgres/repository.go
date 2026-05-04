@@ -104,11 +104,11 @@ func (r *Repository) GetSubscribtion(ctx context.Context, userId, seviceName str
 func (r *Repository) GetSubscribtionsPrice(ctx context.Context, requestStruct domain.Subscribtion) (int, error) {
 	end := "(CASE WHEN end_date IS NOT NULL THEN end_date ELSE current_date END)" //"current_date"
 	start := "start_date"
-	if requestStruct.End.IsValid() {
+	if requestStruct.End != nil && requestStruct.End.IsValid() {
 		dateEnd := requestStruct.End.DateString()
 		end = fmt.Sprintf("(CASE WHEN end_date IS NOT NULL THEN LEAST(end_date, '%s'::date) ELSE '%s'::date END)", dateEnd, dateEnd)
 	}
-	if requestStruct.Start.IsValid() {
+	if requestStruct.Start != nil && requestStruct.Start.IsValid() {
 		start = fmt.Sprintf("GREATEST(start_date, '%s'::date)", requestStruct.Start.DateString())
 	}
 

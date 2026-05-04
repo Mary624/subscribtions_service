@@ -60,12 +60,16 @@ paths:
     get:
       description: Получает подписку
       parameters:
-      - description: getSubscribtion
-        in: body
-        name: Entry
+      - description: get subscription by user id
+        in: query
+        name: user_id
         required: true
-        schema:
-          $ref: '#/definitions/subscriptions_rest_internal_domain.Subscribtion'
+        type: string
+      - description: get subscription by service name
+        in: query
+        name: service_name
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -135,12 +139,24 @@ paths:
     get:
       description: Получает стоимость подписок за указанный период
       parameters:
-      - description: getSubscribtionsPrice
-        in: body
-        name: Entry
+      - description: get subscription price by user id
+        in: query
+        name: user_id
         required: true
-        schema:
-          $ref: '#/definitions/subscriptions_rest_internal_domain.Subscribtion'
+        type: string
+      - description: get subscription price by service name
+        in: query
+        name: service_name
+        required: true
+        type: string
+      - description: filter by start date
+        in: query
+        name: start_date
+        type: string
+      - description: filter by end date
+        in: query
+        name: end_date
+        type: string
       produces:
       - application/json
       responses:

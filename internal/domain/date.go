@@ -21,20 +21,15 @@ func (d *Date) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, d.String())), nil
 }
 
-func (d *Date) UnmarshalJSON(data []byte) error {
-	dataStr := strings.ReplaceAll(string(data), "\"", "")
-	if dataStr == "" {
-		return nil
-	}
-
-	parts := strings.Split(dataStr, "-")
+func DateFromString(str string) (*Date, error) {
+	parts := strings.Split(str, "-")
 	if len(parts) != 2 {
-		return fmt.Errorf("invalid date")
+		return nil, fmt.Errorf("invalid date")
 	}
 
 	year, err := strconv.Atoi(parts[1])
 	if err != nil {
-		return fmt.Errorf("failed to parse year: %w", err)
+		return nil, fmt.Errorf("failed to parse year: %w", err)
 	}
 
 	if len(parts[0]) > 1 && parts[0][0] == 0 {
@@ -42,11 +37,30 @@ func (d *Date) UnmarshalJSON(data []byte) error {
 	}
 	month, err := strconv.Atoi(parts[0])
 	if err != nil {
-		return fmt.Errorf("failed to parse month: %w", err)
+		return nil, fmt.Errorf("failed to parse month: %w", err)
 	}
+
+	d := &Date{}
 
 	d.Year = year
 	d.Month = month
+
+	return d, nil
+}
+
+func (d *Date) UnmarshalJSON(data []byte) error {
+	dataStr := strings.ReplaceAll(string(data), "\"", "")
+	if dataStr == "" {
+		return nil
+	}
+
+	date, err := DateFromString(dataStr)
+	if err != nil {
+		return err
+	}
+
+	d.Month = date.Month
+	d.Year = date.Year
 
 	return nil
 }

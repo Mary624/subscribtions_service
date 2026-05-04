@@ -27,13 +27,18 @@ const docTemplate = `{
                 "summary": "Get subscription",
                 "parameters": [
                     {
-                        "description": "getSubscribtion",
-                        "name": "Entry",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/subscriptions_rest_internal_domain.Subscribtion"
-                        }
+                        "type": "string",
+                        "description": "get subscription by user id",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "get subscription by service name",
+                        "name": "service_name",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -171,13 +176,30 @@ const docTemplate = `{
                 "summary": "Get subscriptions price",
                 "parameters": [
                     {
-                        "description": "getSubscribtionsPrice",
-                        "name": "Entry",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/subscriptions_rest_internal_domain.Subscribtion"
-                        }
+                        "type": "string",
+                        "description": "get subscription price by user id",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "get subscription price by service name",
+                        "name": "service_name",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "filter by start date",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "filter by end date",
+                        "name": "end_date",
+                        "in": "query"
                     }
                 ],
                 "responses": {

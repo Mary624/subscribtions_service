@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -144,22 +143,26 @@ func (s *Server) getSubscribtions(c *fiber.Ctx) error {
 //
 //	@Summary		Get subscription
 //	@Description	Получает подписку
-//	@Param 			Entry body domain.Subscribtion true "getSubscribtion" example({"service_name": "Yandex Plus", "user_id": ""} )
+//	@Param 			user_id query string true "get subscription by user id"
+//	@Param 			service_name query string true "get subscription by service name"
 //	@Produce		json
 //	@Success		200	{object}	domain.Subscribtion
 //	@Failure		500	{object}	nil
 //	@Failure		400	{object}	nil
 //	@Router			/subscribtions [get]
 func (s *Server) getSubscribtion(c *fiber.Ctx) error {
-	request, err := validateAndReturnStruct(c)
-	if err != nil {
-		return err
+	queries := c.Queries()
+	userId, okUserId := queries["user_id"]
+	serviceName, okServiceName := queries["service_name"]
+	if !okUserId || !okServiceName {
+		return newError(fmt.Errorf("invalid params"),
+			http.StatusBadRequest, fiber.Map{})
 	}
 
 	ctxPostgres, cancel := context.WithTimeout(context.Background(), s.cfg.Postgres.Timeout)
 	defer cancel()
 
-	subscribtion, err := s.repository.GetSubscribtion(ctxPostgres, request.UserId, request.ServiceName)
+	subscribtion, err := s.repository.GetSubscribtion(ctxPostgres, userId, serviceName)
 	if err != nil {
 		return newError(fmt.Errorf("failed to get subscribtion: %w", err),
 			http.StatusInternalServerError, fiber.Map{})
@@ -172,35 +175,63 @@ func (s *Server) getSubscribtion(c *fiber.Ctx) error {
 //
 //	@Summary		Get subscriptions price
 //	@Description	Получает стоимость подписок за указанный период
-//	@Param 			Entry body domain.Subscribtion true "getSubscribtionsPrice" example({"service_name": "Yandex Plus", "user_id": "", "start_date": "", "end_date": ""} )
+//	@Param 			user_id query string true "get subscription price by user id"
+//	@Param 			service_name query string true "get subscription price by service name"
+//	@Param 			start_date query string false "filter by start date"
+//	@Param 			end_date query string false "filter by end date"
 //	@Produce		json
 //	@Success		200	{object}	domain.PriceResponse
 //	@Failure		500	{object}	nil
 //	@Failure		400	{object}	nil
 //	@Router			/subscribtions/price [get]
 func (s *Server) getSubscribtionsPrice(c *fiber.Ctx) error {
-	request, err := validateAndReturnStruct(c)
-	if err != nil {
-		return err
+	queries := c.Queries()
+	userId, okUserId := queries["user_id"]
+	serviceName, okServiceName := queries["service_name"]
+	if !okUserId || !okServiceName {
+		return newError(fmt.Errorf("invalid params"),
+			http.StatusBadRequest, fiber.Map{})
 	}
-	if request.End != nil && request.End.IsValid() && request.Start != nil && request.Start.IsValid() && request.Start.After(*request.End) {
+	startDateStr, okStart := queries["start_date"]
+	endDateStr, okEnd := queries["end_date"]
+	var startDate, endDate *domain.Date
+	var err error
+	if okStart {
+		startDate, err = domain.DateFromString(startDateStr)
+		if err != nil {
+			return newError(fmt.Errorf("invalid start date"),
+				http.StatusBadRequest, fiber.Map{})
+		}
+	}
+	if okEnd {
+		endDate, err = domain.DateFromString(endDateStr)
+		if err != nil {
+			return newError(fmt.Errorf("invalid end date"),
+				http.StatusBadRequest, fiber.Map{})
+		}
+	}
+
+	if endDate != nil && endDate.IsValid() && startDate != nil && startDate.IsValid() && startDate.After(*endDate) {
 		return newError(fmt.Errorf("invalid dates"),
 			http.StatusBadRequest, fiber.Map{})
 	}
 
 	ctxPostgres, cancel := context.WithTimeout(context.Background(), s.cfg.Postgres.Timeout)
 	defer cancel()
-	price, err := s.repository.GetSubscribtionsPrice(ctxPostgres, request)
+	price, err := s.repository.GetSubscribtionsPrice(ctxPostgres, domain.Subscribtion{
+		UserId:      userId,
+		ServiceName: serviceName,
+		Start:       startDate,
+		End:         endDate,
+	})
 	if err != nil {
 		return newError(fmt.Errorf("failed to get price: %w", err),
 			http.StatusInternalServerError, fiber.Map{})
 	}
 
-	responseBody, err := json.Marshal(domain.PriceResponse{
+	return c.Status(http.StatusOK).JSON(domain.PriceResponse{
 		Price: price,
 	})
-
-	return c.Status(http.StatusOK).JSON(responseBody)
 }
 
 // CreateSubscribtion godoc
