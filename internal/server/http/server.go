@@ -238,7 +238,7 @@ func (s *Server) getSubscribtionsPrice(c *fiber.Ctx) error {
 //
 //		@Summary		Create subscription
 //		@Description	Создает подписку
-//		@Param 			Entry body domain.Subscribtion true "createSubscribtion" example({"service_name": "Yandex Plus", "user_id": "", "price": 400, "start_date": "07-2025", "end_date": ""} )
+//		@Param 			Entry body domain.SubscribtionRequest true "createSubscribtion" example({"service_name": "Yandex Plus", "user_id": "", "price": 400, "start_date": "07-2025", "end_date": ""} )
 //		@Produce		json
 //		@Success		201	{object}	nil
 //	 	@Failure		500	{object}	nil
@@ -273,7 +273,7 @@ func (s *Server) createSubscribtion(c *fiber.Ctx) error {
 //
 //	@Summary		Update subscription
 //	@Description	Обновляет подписку
-//	@Param 			Entry body domain.Subscribtion true "updateSubscribtion" example({"service_name": "Yandex Plus", "user_id": "", "price": 400, "start_date": "07-2025", "end_date": ""} )
+//	@Param 			Entry body domain.SubscribtionRequest true "updateSubscribtion" example({"service_name": "Yandex Plus", "user_id": "", "price": 400, "start_date": "07-2025", "end_date": ""} )
 //	@Produce		json
 //	@Success		200	{object}	nil
 //	@Failure		500	{object}	nil
@@ -308,22 +308,26 @@ func (s *Server) updateSubscribtion(c *fiber.Ctx) error {
 //
 //	@Summary		Delete subscription
 //	@Description	Удаляет подписку
-//	@Param 			Entry body domain.Subscribtion true "deleteSubscribtion" example({"service_name": "Yandex Plus", "user_id": ""} )
+//	@Param 			user_id query string true "delete subscription by user id"
+//	@Param 			service_name query string true "delete subscription by service name"
 //	@Produce		json
 //	@Success		200	{object}	nil
 //	@Failure		500	{object}	nil
 //	@Failure		400	{object}	nil
 //	@Router			/subscribtions [delete]
 func (s *Server) deleteSubscribtion(c *fiber.Ctx) error {
-	request, err := validateAndReturnStruct(c)
-	if err != nil {
-		return err
+	queries := c.Queries()
+	userId, okUserId := queries["user_id"]
+	serviceName, okServiceName := queries["service_name"]
+	if !okUserId || !okServiceName {
+		return newError(fmt.Errorf("invalid params"),
+			http.StatusBadRequest, fiber.Map{})
 	}
 
 	ctxPostgres, cancel := context.WithTimeout(context.Background(), s.cfg.Postgres.Timeout)
 	defer cancel()
 
-	err = s.repository.DeleteSubscribtion(ctxPostgres, request.UserId, request.ServiceName)
+	err := s.repository.DeleteSubscribtion(ctxPostgres, userId, serviceName)
 	if err != nil {
 		return newError(fmt.Errorf("failed to delete subscribtion: %w", err),
 			http.StatusInternalServerError, fiber.Map{})
@@ -333,7 +337,7 @@ func (s *Server) deleteSubscribtion(c *fiber.Ctx) error {
 }
 
 func validateAndReturnStruct(c *fiber.Ctx) (domain.Subscribtion, error) {
-	var request domain.Subscribtion
+	var request domain.SubscribtionRequest
 	if err := c.BodyParser(&request); err != nil {
 		return domain.Subscribtion{}, newError(fmt.Errorf("failed to parse request body: %w", err),
 			http.StatusBadRequest, fiber.Map{})
@@ -343,5 +347,28 @@ func validateAndReturnStruct(c *fiber.Ctx) (domain.Subscribtion, error) {
 			http.StatusBadRequest, fiber.Map{})
 	}
 
-	return request, nil
+	var start, end *domain.Date
+	var err error
+	if request.Start != "" {
+		start, err = domain.DateFromString(request.Start)
+		if err != nil {
+			return domain.Subscribtion{}, newError(fmt.Errorf("invalid start date"),
+				http.StatusBadRequest, fiber.Map{})
+		}
+	}
+	if request.End != "" {
+		end, err = domain.DateFromString(request.End)
+		if err != nil {
+			return domain.Subscribtion{}, newError(fmt.Errorf("invalid end date"),
+				http.StatusBadRequest, fiber.Map{})
+		}
+	}
+
+	return domain.Subscribtion{
+		UserId:      request.UserId,
+		ServiceName: request.ServiceName,
+		Price:       request.Price,
+		Start:       start,
+		End:         end,
+	}, nil
 }

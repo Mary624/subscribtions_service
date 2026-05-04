@@ -69,7 +69,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/subscriptions_rest_internal_domain.Subscribtion"
+                            "$ref": "#/definitions/subscriptions_rest_internal_domain.SubscribtionRequest"
                         }
                     }
                 ],
@@ -98,7 +98,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/subscriptions_rest_internal_domain.Subscribtion"
+                            "$ref": "#/definitions/subscriptions_rest_internal_domain.SubscribtionRequest"
                         }
                     }
                 ],
@@ -122,13 +122,18 @@ const docTemplate = `{
                 "summary": "Delete subscription",
                 "parameters": [
                     {
-                        "description": "deleteSubscribtion",
-                        "name": "Entry",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/subscriptions_rest_internal_domain.Subscribtion"
-                        }
+                        "type": "string",
+                        "description": "delete subscription by user id",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "delete subscription by service name",
+                        "name": "service_name",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -256,6 +261,27 @@ const docTemplate = `{
                 },
                 "start_date": {
                     "$ref": "#/definitions/subscriptions_rest_internal_domain.Date"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "subscriptions_rest_internal_domain.SubscribtionRequest": {
+            "description": "The subscribtion",
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "service_name": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
                 },
                 "user_id": {
                     "type": "string"

@@ -28,6 +28,20 @@ definitions:
       user_id:
         type: string
     type: object
+  subscriptions_rest_internal_domain.SubscribtionRequest:
+    description: The subscribtion
+    properties:
+      end_date:
+        type: string
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -41,12 +55,16 @@ paths:
     delete:
       description: Удаляет подписку
       parameters:
-      - description: deleteSubscribtion
-        in: body
-        name: Entry
+      - description: delete subscription by user id
+        in: query
+        name: user_id
         required: true
-        schema:
-          $ref: '#/definitions/subscriptions_rest_internal_domain.Subscribtion'
+        type: string
+      - description: delete subscription by service name
+        in: query
+        name: service_name
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -90,7 +108,7 @@ paths:
         name: Entry
         required: true
         schema:
-          $ref: '#/definitions/subscriptions_rest_internal_domain.Subscribtion'
+          $ref: '#/definitions/subscriptions_rest_internal_domain.SubscribtionRequest'
       produces:
       - application/json
       responses:
@@ -109,7 +127,7 @@ paths:
         name: Entry
         required: true
         schema:
-          $ref: '#/definitions/subscriptions_rest_internal_domain.Subscribtion'
+          $ref: '#/definitions/subscriptions_rest_internal_domain.SubscribtionRequest'
       produces:
       - application/json
       responses:
